@@ -210,7 +210,7 @@ function App() {
             <Route path="/seller/dashboard" element={<SellerDashboard />} />
             <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
             {/* delivery partner */}
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<CustomerDashboard />} />
             <Route path="/profile/grow" element={<ProfileGrow />} />
             <Route path="/seller/apply" element={<SellerApply />} />
             <Route path="/delivery/apply" element={<DeliveryApply />} />

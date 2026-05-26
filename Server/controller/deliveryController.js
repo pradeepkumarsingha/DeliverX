@@ -80,6 +80,7 @@ exports.myOrders = async (req, res) => {
 
 
 exports.pickupOrder = async (req, res) => {
+  try {
   const { orderId } = req.params;
   const { otp } = req.body;
 
@@ -87,7 +88,7 @@ exports.pickupOrder = async (req, res) => {
     _id: orderId,
     deliveryPartnerId: req.user._id,
     orderStatus: "READY_FOR_PICKUP",
-  }).populate("userId");
+  }).populate("userId", "email name");
 
   if (!order) {
     return res.status(404).json({ message: "Order not assigned" });
@@ -95,6 +96,10 @@ exports.pickupOrder = async (req, res) => {
 
   if (order.pickupOtp !== String(otp)) {
     return res.status(400).json({ message: "Invalid pickup OTP" });
+  }
+
+  if (!order.userId?.email) {
+    return res.status(400).json({ message: "Customer email not found" });
   }
 
   const deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -112,6 +117,10 @@ exports.pickupOrder = async (req, res) => {
   res.json({
     message: "Pickup verified. Delivery OTP sent to customer.",
   });
+  } catch (err) {
+    console.error("pickupOrder error:", err);
+    res.status(500).json({ message: err.message || "Server error" });
+  }
 };
 
 

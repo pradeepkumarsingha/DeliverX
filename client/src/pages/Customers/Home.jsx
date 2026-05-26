@@ -1,37 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-
-import {
-  Typography,
-  Box,
-  TextField,
-  InputAdornment,
-  Chip,
-  Grid,
-  Paper,
-  Alert,
-  Container,
-  Button,
-  Card,
-  CardContent,
-  Avatar,
-  Stack,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import VerifiedIcon from '@mui/icons-material/Verified';
-import StarIcon from '@mui/icons-material/Star';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
-import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import { motion } from 'framer-motion';
+import { 
+  Search, 
+  Truck, 
+  Clock, 
+  ShieldCheck, 
+  Utensils, 
+  ShoppingBasket, 
+  Laptop, 
+  Store
+} from 'lucide-react';
 import MainLayout from '../../layouts/MainLayout';
 import ProductCard from '../../components/ProductCard';
 import { getProducts } from "../../services/Api";
 import { addToCart } from "../../services/Cartapi";
-
 
 const Home = () => {
   const navigate = useNavigate();
@@ -40,85 +23,88 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
 
-    useEffect(() => {
-  getProducts()
-    .then((data) => {
-      setProducts(data);
-      setFilteredProducts(data);
-    })
-    .catch((err) => console.error("Failed to fetch products", err));
-}, []);
+  useEffect(() => {
+    getProducts()
+      .then((data) => {
+        setProducts(data);
+        setFilteredProducts(data);
+      })
+      .catch((err) => console.error("Failed to fetch products", err));
+  }, []);
 
-  
-  
   const categories = ['All', 'Food', 'Groceries', 'Electronics', 'Clothing', 'Books', 'Health', 'Beauty'];
 
   const featuredCategories = [
     {
       name: 'Food & Dining',
-      icon: <RestaurantIcon sx={{ fontSize: 32 }} />,
-      color: '#ef4444',
-      bgColor: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+      icon: <Utensils size={32} className="text-red-500" />,
+      bgColor: 'from-red-100 to-red-200',
+      iconBg: 'bg-white/40',
       count: products.filter(p => p.category === 'Food').length,
     },
     {
       name: 'Groceries',
-      icon: <LocalGroceryStoreIcon sx={{ fontSize: 32 }} />,
-      color: '#10b981',
-      bgColor: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+      icon: <ShoppingBasket size={32} className="text-emerald-500" />,
+      bgColor: 'from-emerald-100 to-emerald-200',
+      iconBg: 'bg-white/40',
       count: products.filter(p => p.category === 'Groceries').length,
     },
     {
       name: 'Electronics',
-      icon: <ShoppingBagIcon sx={{ fontSize: 32 }} />,
-      color: '#3b82f6',
-      bgColor: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+      icon: <Laptop size={32} className="text-blue-500" />,
+      bgColor: 'from-blue-100 to-blue-200',
+      iconBg: 'bg-white/40',
       count: products.filter(p => p.category === 'Electronics').length,
     },
   ];
 
   const highlights = [
     {
-      icon: <LocalShippingIcon sx={{ fontSize: 28, color: 'primary.main' }} />,
+      icon: <Truck size={28} className="text-primary-main" />,
       title: 'Fast Delivery',
       description: 'Get your orders delivered within 30 minutes',
     },
     {
-      icon: <VerifiedIcon sx={{ fontSize: 28, color: 'success.main' }} />,
+      icon: <ShieldCheck size={28} className="text-emerald-500" />,
       title: 'Quality Assured',
       description: 'All products verified by our quality team',
     },
     {
-      icon: <AccessTimeIcon sx={{ fontSize: 28, color: 'warning.main' }} />,
+      icon: <Clock size={28} className="text-orange-500" />,
       title: '24/7 Support',
       description: 'Round the clock customer support available',
     },
   ];
 
   useEffect(() => {
-  let filtered = products;
+    let filtered = products;
 
-  if (searchTerm) {
-    filtered = filtered.filter(
-      (product) =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
 
-  if (selectedCategory !== "All") {
-    filtered = filtered.filter(
-      (product) => product.category === selectedCategory
-    );
-  }
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter(
+        (product) => product.category === selectedCategory
+      );
+    }
 
-  setFilteredProducts(filtered);
-}, [searchTerm, selectedCategory, products]);
+    setFilteredProducts(filtered);
+  }, [searchTerm, selectedCategory, products]);
 
   const handleAddToCart = async (product) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     try {
       await addToCart({
-        productId: product._id,   // IMPORTANT
+        productId: product._id,
         quantity: 1,
       });
     } catch (err) {
@@ -126,294 +112,178 @@ const Home = () => {
     }
   };
 
- 
   const handleBuyNow = async (product) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     await handleAddToCart(product);
     navigate("/customer/checkout");
   };
 
   return (
-      <MainLayout userRole="customer">
+    <MainLayout userRole="customer">
       
       {/* Hero Section */}
-      <Box
-        sx={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: 4,
-          p: 6,
-          mb: 6,
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="4"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-          },
-        }}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-3xl mb-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-primary-main shadow-2xl"
       >
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', color: 'white', position: 'relative', zIndex: 1 }}>
-            <Typography
-              variant="h2"
-              component="h1"
-              gutterBottom
-              sx={{
-                fontWeight: 800,
-                fontSize: { xs: '2.5rem', md: '3.5rem' },
-                mb: 2,
-              }}
-            >
-              Welcome to DeliverX 🚀
-            </Typography>
-            <Typography
-              variant="h5"
-              sx={{
-                mb: 4,
-                fontWeight: 400,
-                opacity: 0.9,
-                fontSize: { xs: '1.25rem', md: '1.5rem' },
-              }}
-            >
-              Discover amazing products from local sellers near you
-            </Typography>
-
-            {/* Search Bar */}
-            <Paper
-              elevation={0}
-              sx={{
-                p: 1,
-                maxWidth: 600,
-                mx: 'auto',
-                borderRadius: 3,
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Search for products, brands, or categories..."
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.05\'%3E%3Ccircle cx=\'30\' cy=\'30\' r=\'4\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+        
+        <div className="relative z-10 px-6 py-16 sm:py-24 md:px-12 text-center text-white">
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 drop-shadow-lg"
+          >
+            Welcome to DeliverX 🚀
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-lg sm:text-2xl font-medium text-white/90 mb-10 max-w-2xl mx-auto drop-shadow-md"
+          >
+            Fast, reliable, and smart. Discover amazing products from local sellers near you.
+          </motion.p>
+          
+          {/* Search Bar */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="max-w-2xl mx-auto bg-white/10 backdrop-blur-md p-2 rounded-2xl shadow-lg border border-white/20"
+          >
+            <div className="flex items-center bg-white rounded-xl overflow-hidden px-4 py-2">
+              <Search className="text-slate-400 mr-2" size={24} />
+              <input 
+                type="text" 
+                placeholder="Search for products, brands, or categories..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary' }} />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'transparent',
-                    '& fieldset': {
-                      border: 'none',
-                    },
-                  },
-                }}
+                className="w-full py-2 outline-none text-slate-800 bg-transparent font-medium"
               />
-            </Paper>
-          </Box>
-        </Container>
-      </Box>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
 
       {/* Highlights Section */}
-      <Box sx={{ mb: 6 }}>
-        <Grid container spacing={3}>
-          {highlights.map((highlight, index) => (
-            <Grid item xs={12} md={4} key={index}>
-              <Paper
-                sx={{
-                  p: 3,
-                  textAlign: 'center',
-                  borderRadius: 3,
-                  background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
-                  },
-                }} >
-             
-                <Box sx={{ mb: 2 }}>
-                  {highlight.icon}
-                </Box>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                  {highlight.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {highlight.description}
-                </Typography>
-              </Paper>
-            </Grid>
-
-          ))}
-        </Grid>
-      </Box>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        {highlights.map((highlight, index) => (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 * index }}
+            key={index}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center group"
+          >
+            <div className="w-14 h-14 mx-auto bg-slate-50 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary-50 transition-colors">
+              {highlight.icon}
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">{highlight.title}</h3>
+            <p className="text-slate-500 font-medium">{highlight.description}</p>
+          </motion.div>
+        ))}
+      </div>
 
       {/* Featured Categories */}
-      <Box sx={{ mb: 6 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 700,
-            mb: 1,
-            textAlign: 'center',
-          }}
-        >
-          Shop by Category
-        </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ mb: 4, textAlign: 'center' }}
-        >
-          Explore our most popular categories
-        </Typography>
+      <div className="mb-16">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-extrabold text-slate-900 mb-3">Shop by Category</h2>
+          <p className="text-slate-500 font-medium text-lg">Explore our most popular categories</p>
+        </div>
 
-        <Grid container spacing={3}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {featuredCategories.map((category, index) => (
-            <Grid item xs={12} md={4} key={index}>
-              <Card
-                sx={{
-                  cursor: 'pointer',
-                  borderRadius: 3,
-                  background: category.bgColor,
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  transition: 'all 0.3s ease',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
-                  },
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    width: 80,
-                    height: 80,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '50%',
-                    transform: 'translate(40px, -40px)',
-                  },
-                }}
-                onClick={() => setSelectedCategory(category.name.split(' ')[0])}
-              >
-                <CardContent sx={{ p: 4, textAlign: 'center', position: 'relative', zIndex: 1 }}>
-                  <Box
-                    sx={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: 2,
-                      backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mx: 'auto',
-                      mb: 2,
-                    }}
-                  >
-                    {category.icon}
-                  </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                    {category.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {category.count} products available
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 + (0.1 * index) }}
+              key={index}
+              onClick={() => setSelectedCategory(category.name.split(' ')[0])}
+              className={`relative overflow-hidden cursor-pointer rounded-3xl bg-gradient-to-br ${category.bgColor} p-8 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group`}
+            >
+              <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/20 rounded-full blur-2xl group-hover:blur-xl transition-all"></div>
+              
+              <div className={`w-16 h-16 rounded-2xl ${category.iconBg} flex items-center justify-center mb-6 shadow-inner backdrop-blur-sm`}>
+                {category.icon}
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">{category.name}</h3>
+              <p className="text-slate-700 font-semibold opacity-90">{category.count} products</p>
+            </motion.div>
           ))}
-        </Grid>
-      </Box>
+        </div>
+      </div>
 
       {/* Category Filter Chips */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-          Browse All Categories
-        </Typography>
-        <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-          {categories.map((category) => (
-            <Chip
-              key={category}
-              label={`${category} (${products.filter(p => p.category === category || category === 'All').length})`}
-              onClick={() => setSelectedCategory(category)}
-              variant={selectedCategory === category ? 'filled' : 'outlined'}
-              color={selectedCategory === category ? 'primary' : 'default'}
-              sx={{
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                },
-              }}
-            />
-          ))}
-        </Stack>
-      </Box>
+      <div className="mb-10">
+        <h3 className="text-xl font-bold text-slate-800 mb-4">Browse All Categories</h3>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => {
+            const isSelected = selectedCategory === category;
+            const count = products.filter(p => p.category === category || category === 'All').length;
+            return (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
+                  isSelected 
+                    ? 'bg-primary-main text-white shadow-lg shadow-primary-main/30' 
+                    : 'bg-white text-slate-600 border border-slate-200 hover:border-primary-main hover:text-primary-main'
+                }`}
+              >
+                {category} <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] ${isSelected ? 'bg-white/20' : 'bg-slate-100 text-slate-500'}`}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Products Section */}
-      <Box>
+      <div>
         {filteredProducts.length === 0 ? (
-          <Alert
-            severity="info"
-            sx={{
-              borderRadius: 3,
-              py: 4,
-              '& .MuiAlert-icon': {
-                fontSize: '3rem',
-              },
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-              No products found
-            </Typography>
-            <Typography variant="body1">
-              Try adjusting your search terms or browse different categories.
-            </Typography>
-          </Alert>
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-8 flex flex-col items-center justify-center text-center">
+            <Store className="text-blue-300 mb-4" size={48} />
+            <h3 className="text-xl font-bold text-blue-900 mb-2">No products found</h3>
+            <p className="text-blue-700 font-medium">Try adjusting your search terms or browse different categories.</p>
+          </div>
         ) : (
           <>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h5" sx={{ fontWeight: 600 }}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-slate-800 flex items-baseline gap-2">
                 {selectedCategory === 'All' ? 'Featured Products' : `${selectedCategory} Products`}
-                <Typography component="span" variant="body1" color="text.secondary" sx={{ ml: 1 }}>
+                <span className="text-sm font-medium text-slate-400">
                   ({filteredProducts.length} item{filteredProducts.length !== 1 ? 's' : ''})
-                </Typography>
-              </Typography>
+                </span>
+              </h2>
               {selectedCategory !== 'All' && (
-                <Button
-                  variant="outlined"
+                <button
                   onClick={() => setSelectedCategory('All')}
-                  sx={{ borderRadius: 2 }}
+                  className="px-4 py-2 rounded-xl text-sm font-bold text-primary-main bg-primary-50 hover:bg-primary-100 transition-colors"
                 >
                   View All
-                </Button>
+                </button>
               )}
-            </Box>
+            </div>
 
-            <Grid container spacing={3}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredProducts.map((product) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                  <ProductCard
-                    product={product}
-                    onAddToCart={handleAddToCart}
-                    onBuyNow={handleBuyNow}
-                  />
-                </Grid>
+                <ProductCard
+                  key={product._id || product.id}
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                  onBuyNow={handleBuyNow}
+                />
               ))}
-            </Grid>
+            </div>
           </>
         )}
-      </Box>
+      </div>
         
     </MainLayout>
   );

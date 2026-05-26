@@ -1,184 +1,92 @@
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  Button,
-  Box,
-  Chip,
-  Rating,
-  Avatar,
-} from '@mui/material';
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import BoltIcon from '@mui/icons-material/Bolt';
-import StoreIcon from '@mui/icons-material/Store';
+import { motion } from 'framer-motion';
+import { ShoppingCart, Zap, Store } from 'lucide-react';
 
 const ProductCard = ({ product, onAddToCart, onBuyNow }) => {
-   const hasDiscount =
-    product.originalPrice && product.originalPrice > product.price;
+  const hasDiscount = product.originalPrice && product.originalPrice > product.price;
 
   const discountPercent = hasDiscount
-    ? Math.round(
-        ((product.originalPrice - product.price) / product.originalPrice) * 100
-      )
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
   return (
-    <Card
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        '&:hover': {
-          transform: 'translateY(-8px)',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
-        },
-      }}
+    <motion.div
+      whileHover={{ y: -8 }}
+      className="group relative bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-slate-100 overflow-hidden flex flex-col h-full hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] transition-shadow duration-300"
     >
       {/* Product Image */}
-      {/* Product Image */}
-<Box
-  sx={{
-    width: "100%",
-    aspectRatio: "1 / 1",        // ✅ forces square
-    overflow: "hidden",
-    backgroundColor: "#f5f5f5",
-  }}
->
-  <img
-    src={product.image}
-    alt={product.name}
-    style={{
-      width: "100%",
-      height: "100%",
-      objectFit: "contain",      // ✅ key fix for kettle
-    }}
-  />
-</Box>
+      <div className="relative w-full aspect-square bg-slate-50 overflow-hidden p-4 flex items-center justify-center">
+        {hasDiscount && (
+          <div className="absolute top-3 left-3 z-10 bg-emerald-500 text-white text-[11px] font-bold px-2 py-1 rounded-full shadow-md">
+            {discountPercent}% OFF
+          </div>
+        )}
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out drop-shadow-sm"
+        />
+      </div>
 
-
-      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 3 }}>
-        {/* Product Name */}
-        <Typography
-          gutterBottom
-          variant="h6"
-          component="h2"
-          sx={{
-            fontWeight: 600,
-            fontSize: '1.1rem',
-            lineHeight: 1.3,
-            mb: 1,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
-        >
+      <div className="flex-grow flex flex-col p-5">
+        {/* Category & Title */}
+        <div className="mb-1">
+          {product.category && (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-primary-main/70">
+              {product.category}
+            </span>
+          )}
+        </div>
+        <h2 className="font-bold text-slate-800 text-lg leading-tight mb-2 line-clamp-2">
           {product.name}
-        </Typography>
+        </h2>
 
-        {/* Product Description */}
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            mb: 2,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            lineHeight: 1.4,
-          }}
-        >
+        {/* Description */}
+        <p className="text-slate-500 text-sm mb-4 line-clamp-2 leading-snug flex-grow">
           {product.description}
-        </Typography>
+        </p>
 
         {/* Seller Info */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Avatar sx={{ width: 24, height: 24, mr: 1, bgcolor: 'primary.main' }}>
-            <StoreIcon sx={{ fontSize: 14 }} />
-          </Avatar>
-          <Typography variant="body2" color="text.secondary">
+        <div className="flex items-center gap-2 mb-4 bg-slate-50 border border-slate-100 rounded-lg px-2 py-1.5 w-max">
+          <div className="w-5 h-5 rounded-md bg-primary-100 text-primary-main flex items-center justify-center">
+            <Store size={12} />
+          </div>
+          <span className="text-xs font-semibold text-slate-600">
             Seller #{product.sellerId}
-          </Typography>
-        </Box>
+          </span>
+        </div>
 
         {/* Price Section */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-  <Typography
-    variant="h6"
-    sx={{ fontWeight: 700, color: 'primary.main', fontSize: '1.25rem' }}
-  >
-    ₹{product.price}
-  </Typography>
-
-  {hasDiscount && (
-    <>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ ml: 1, textDecoration: 'line-through' }}
-      >
-        ₹{product.originalPrice}
-      </Typography>
-
-      <Chip
-        label={`${discountPercent}% OFF`}
-        size="small"
-        color="success"
-        sx={{
-          ml: 1,
-          height: 18,
-          fontSize: '0.65rem',
-          fontWeight: 600,
-          width: 'fit-content',
-        }}
-      />
-    </>
-  )}
-</Box>
-
+        <div className="flex items-end gap-2 mb-5">
+          <span className="text-2xl font-extrabold tracking-tight text-slate-900">
+            ₹{product.price}
+          </span>
+          {hasDiscount && (
+            <span className="text-sm font-semibold text-slate-400 line-through mb-1">
+              ₹{product.originalPrice}
+            </span>
+          )}
+        </div>
 
         {/* Action Buttons */}
-        <Box sx={{ mt: 'auto', display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<AddShoppingCartIcon />}
+        <div className="flex gap-2 mt-auto">
+          <button
             onClick={() => onAddToCart(product)}
-            fullWidth
-            sx={{
-              borderColor: 'primary.main',
-              color: 'primary.main',
-              '&:hover': {
-                borderColor: 'primary.dark',
-                backgroundColor: 'primary.light',
-                color: 'primary.dark',
-              },
-            }}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-primary-50 text-primary-main bg-white hover:bg-primary-50 font-bold text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-main/30"
           >
-            Add to Cart
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<BoltIcon />}
+            <ShoppingCart size={16} />
+            <span className="hidden sm:inline">Add</span>
+          </button>
+          <button
             onClick={() => onBuyNow(product)}
-            fullWidth
-            sx={{
-              background: 'linear-gradient(45deg, #2563eb 30%, #f59e0b 90%)',
-              '&:hover': {
-                background: 'linear-gradient(45deg, #1d4ed8 30%, #d97706 90%)',
-              },
-            }}
+            className="flex-[2] flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-primary-main to-primary-light text-white font-bold text-sm shadow-md shadow-primary-main/20 hover:shadow-lg hover:shadow-primary-main/40 transition-shadow focus:outline-none focus:ring-2 focus:ring-primary-main/30"
           >
+            <Zap size={16} className="fill-white" />
             Buy Now
-          </Button>
-        </Box>
-      </CardContent>
-    </Card>
+          </button>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 
