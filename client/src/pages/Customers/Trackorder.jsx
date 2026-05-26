@@ -13,6 +13,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import axios from "axios";
+import Api from "../../services/Api";
 
 const steps = [
   "PLACED",
@@ -31,26 +32,16 @@ const TrackOrder = ({ orderId }) => {
     // eslint-disable-next-line
   }, []);
 
-  const fetchOrder = async () => {
-    try {
-      const token = localStorage.getItem("token");
+ const fetchOrder = async () => {
+  try {
+    const token = localStorage.getItem("token");
 
-      const res = await axios.get(
-        `http://localhost:8000/api/order/${orderId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setOrder(res.data);
-    } catch (err) {
-      console.error("Fetch order failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // 2. Use 'Api' instead of 'axios' and remove the hardcoded origin
+    const res = await Api.get(`/order/${orderId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
   /* ---------------- SAFETY GUARDS ---------------- */
   if (loading) {

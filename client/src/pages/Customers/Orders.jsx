@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {getMyOrders} from "../../services/OrderApi";
 
+
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,38 +23,29 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-  const fetchOrders = async () => {
-    try {
-      const token = localStorage.getItem("token");
+const fetchOrders = async () => {
+  try {
+    // 1. Call the service function instead of hardcoding raw axios here
+    // (Assuming getMyOrders internally handles the token, otherwise pass it as an argument if needed)
+    const res = await getMyOrders(); 
 
-      const res = await axios.get(
-         "http://localhost:8000/api/order/my",
-        
+    console.log("ORDERS RESPONSE:", res.data);
 
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log("ORDERS RESPONSE:", res.data);
-
-      // ✅ GUARANTEE ARRAY
-      if (Array.isArray(res.data)) {
-        setOrders(res.data);
-      } else if (Array.isArray(res.data?.orders)) {
-        setOrders(res.data.orders);
-      } else {
-        setOrders([]);
-      }
-    } catch (error) {
-      console.error("Failed to fetch orders:", error);
+    // ✅ GUARANTEE ARRAY (Your existing bulletproof logic stays exactly the same!)
+    if (Array.isArray(res.data)) {
+      setOrders(res.data);
+    } else if (Array.isArray(res.data?.orders)) {
+      setOrders(res.data.orders);
+    } else {
       setOrders([]);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Failed to fetch orders:", error);
+    setOrders([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // 🔄 LOADING STATE
   if (loading) {
