@@ -19,7 +19,7 @@ import Cart from './pages/Customers/Cart';
 import { useState, useEffect } from "react";
 import Loader from "./components/Loader";
 import Orders from "./pages/Customers/Orders";
-import TrackOrder from "./pages/Customers/TrackOrder.jsx";
+import TrackOrder from "./pages/Customers/TrackOrder";
 import { useParams } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 
