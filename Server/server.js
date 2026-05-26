@@ -19,7 +19,7 @@ const sellerRoutes = require("./routes/sellerRoutes");
 const deliveryRoutes = require("./routes/deliveryRoutes");
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes=require("./routes/cartRoute");
-const paymentRoutes=require("./routes/PaymentRoute");
+const paymentRoutes=require("./routes/paymentRoute");
 
 
 
